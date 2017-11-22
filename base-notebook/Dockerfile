@@ -18,8 +18,14 @@ RUN apt-get update && apt-get -yq dist-upgrade \
     bzip2 \
     ca-certificates \
     sudo \
+    ssh \
     locales \
     fonts-liberation \
+    linux-headers-4.10.0-1009-gcp \
+    python3-dev \
+    git \
+    gcc \
+    libmysqlclient-dev \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -82,6 +88,21 @@ RUN conda install --quiet --yes \
     jupyter labextension install @jupyterlab/hub-extension@^0.6.0 && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     fix-permissions $CONDA_DIR
+
+COPY github_user.tgz /tmp/github_user.tgz
+
+RUN mkdir /home/$NB_USER/.ssh && \
+    ssh-keyscan github.com >> /home/$NB_USER/.ssh/known_hosts && \
+    tar -xzf /tmp/github_user.tgz -C /home/$NB_USER/.ssh && \
+    chmod 600 /home/$NB_USER/.ssh/id_rsa && \
+    chmod 644 /home/$NB_USER/.ssh/id_rsa.pub
+
+# Install CyberJack Packages
+RUN /opt/conda/bin/pip install git+ssh://git@github.com/CyberJackGit/cyberjack-gcp.git@v0.6.4
+RUN /opt/conda/bin/pip install google-auth-httplib2
+RUN /opt/conda/bin/pip install git+ssh://git@github.com/CyberJackGit/CyberJack-Core.git@v0.2.45
+
+COPY external-collection-scanner.json /tmp/
 
 USER root
 

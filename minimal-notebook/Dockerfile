@@ -33,3 +33,5 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_USER
+
+ENV GOOGLE_APPLICATION_CREDENTIALS /tmp/external-collection-scanner.json
